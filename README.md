@@ -21,10 +21,10 @@
 
 ## CRUD API Link & Working:
   * #### USER Register :POST API  (http://127.0.0.1:6000/api/user/add)
-    * userName: Required, text Limit 3 to 15
+    * userName: Required, text Limit 3 to 15, unique
     * firstName: Required, text Limit 3 to 15 
     * lastName: Optional, text Limit 3 to 15
-    * email: Required, text Limit 3 to 50 , Duplicate Validation
+    * email: Required, text Limit 3 to 50 ,
     * password : Convert bcrypt, Limit 5 to 15
     * reset_password: Default Value:true,
     * organization : { orgName,address:{ address1,address2,city ,state etc Required }.optional }.optional
