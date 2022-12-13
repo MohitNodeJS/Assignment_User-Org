@@ -1,7 +1,8 @@
 # CRUD Operation 
     * Two Schema ( User & Organization )
     * JWT Token 
-    * Express-Validation
+    * Express
+    * Validation
 
 ## Project Run Command
 * `npm i`
