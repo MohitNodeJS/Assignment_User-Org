@@ -55,7 +55,7 @@ const userSchemaLogin = joi.object({
 });
 
 const userSchemaUpd = joi.object({
-  userName: joi.string().min(3).max(15).required().optional(),
+  userName: joi.string().min(3).max(15).required().required(),
   firstName: joi.string().min(3).max(15).required().optional(),
   lastName: joi.string().min(3).max(15).required().optional(),
   email: joi.string().email().min(5).max(50).optional(),
