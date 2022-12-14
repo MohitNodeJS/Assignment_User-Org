@@ -25,19 +25,15 @@ const validationHelper = (route, method) => {
 
 export default validationHelper;
 
-//put , Register
 const userSchema = joi.object({
   userName: joi.string().min(3).max(15).required(),
   firstName: joi.string().min(3).max(15).required(),
   lastName: joi.string().min(3).max(15).optional(),
   email: joi.string().email().min(5).max(50).required(),
   password: joi.string().min(5).max(15).required(),
- 
-  // reset_password: joi.boolean().invalid(false),
   organization: joi
   .object({
     orgName: joi.string().min(3).max(15).required(),
-    //inActive: joi.boolean().invalid(false),
     address: joi
       .object({
         orgAddress1: joi.string().min(3).max(15).required(),
@@ -45,37 +41,11 @@ const userSchema = joi.object({
         city: joi.string().min(2).max(15).required(),
         state: joi.string().min(2).max(15).required(),
         zipCode: joi.string().min(3).max(15).required(),
-       
       })
       .optional(),
   })
   .optional(),
 });
-  //organization
-  // organization: joi.object({
-  //   orgName: joi.string().min(3).max(15).required(),
-  //   //inActive: joi.boolean().invalid(false),
-  //   address: joi
-  //     .object(
-  //       {
-  //         orgAddress1: joi.string().required(),
-  //         orgAddress2: joi.string().optional(),
-  //       city: joi.string().min(2).max(15).required(),
-  //         state: joi.string().min(2).max(15).required(),
-  //         zipCode: joi.string().min(3).max(15).required(),
-  //      }
-  //       ||
-  //       { 
-  //         orgAddress1: joi.string().optional(), 
-  //         orgAddress2 : joi.string().required(),
-  //         city: joi.string().min(2).max(15).required(),
-  //         state: joi.string().min(2).max(15).required(),
-  //         zipCode: joi.string().min(3).max(15).required(),
-  //       },),
-          
-  //     })
-  // })
- 
  
 
 //login schema
@@ -107,11 +77,9 @@ const userSchemaUpd = joi.object({
     .optional(),
 });
 
-const orgSchema = joi
-  .object({
+const orgSchema = joi.object({
     orgName: joi.string().min(3).max(15).required(),
-    address: joi
-      .object({
+    address: joi.object({
         orgAddress1: joi.string().min(3).max(15).required(),
         orgAddress2: joi.string().min(3).max(15).required(),
         city: joi.string().min(2).max(10).required(),
