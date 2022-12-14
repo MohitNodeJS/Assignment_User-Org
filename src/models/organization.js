@@ -12,6 +12,14 @@ const organizationSchema = new Schema(
       type: String,
       required: false,
     },
+    userId: {
+      type: String,
+      required: true,
+    },
+    inActive: {
+      type: Boolean,
+      default: false,
+    },
 
     address: {
       orgAddress1: {
@@ -38,15 +46,9 @@ const organizationSchema = new Schema(
         type: String,
         required: false,
       },
-      inActive: {
-        type: Boolean,
-        default: true,
-      },
+    
     },
-    userId: {
-      type: String,
-      required: true,
-    },
+   
   },
   { timestamps: true }
 );

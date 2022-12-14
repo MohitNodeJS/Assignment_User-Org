@@ -6,6 +6,7 @@ const validationHelper = (route, method) => {
       obj = {
         "/api/user/update": userSchemaUpd,
         "/api/org/update/:id": orgSchema,
+       
       };
       return obj[route];
       break;
@@ -15,6 +16,7 @@ const validationHelper = (route, method) => {
         "/api/user/add": userSchema,
         "/api/user/login": userSchemaLogin,
         "/api/organization/add": orgSchema,
+       
       };
       return obj[route];
     default:
@@ -27,27 +29,54 @@ export default validationHelper;
 const userSchema = joi.object({
   userName: joi.string().min(3).max(15).required(),
   firstName: joi.string().min(3).max(15).required(),
-  lastName: joi.string().min(3).max(15).required().optional(),
+  lastName: joi.string().min(3).max(15).optional(),
   email: joi.string().email().min(5).max(50).required(),
   password: joi.string().min(5).max(15).required(),
-  reset_password: joi.boolean().invalid(false),
-  //organization
+ 
+  // reset_password: joi.boolean().invalid(false),
   organization: joi
-    .object({
-      orgName: joi.string().min(3).max(15).optional(),
-      address: joi
-        .object({
-          orgAddress1: joi.string().min(3).max(15).optional(),
-          orgAddress2: joi.string().min(3).max(15).optional(),
-          city: joi.string().min(2).max(15).optional(),
-          state: joi.string().min(2).max(15).optional(),
-          zipCode: joi.string().min(3).max(15).optional(),
-          inActive: joi.boolean().invalid(false),
-        })
-        .optional(),
-    })
-    .optional(),
+  .object({
+    orgName: joi.string().min(3).max(15).required(),
+    //inActive: joi.boolean().invalid(false),
+    address: joi
+      .object({
+        orgAddress1: joi.string().min(3).max(15).required(),
+        orgAddress2: joi.string().min(3).max(15).optional(),
+        city: joi.string().min(2).max(15).required(),
+        state: joi.string().min(2).max(15).required(),
+        zipCode: joi.string().min(3).max(15).required(),
+       
+      })
+      .optional(),
+  })
+  .optional(),
 });
+  //organization
+  // organization: joi.object({
+  //   orgName: joi.string().min(3).max(15).required(),
+  //   //inActive: joi.boolean().invalid(false),
+  //   address: joi
+  //     .object(
+  //       {
+  //         orgAddress1: joi.string().required(),
+  //         orgAddress2: joi.string().optional(),
+  //       city: joi.string().min(2).max(15).required(),
+  //         state: joi.string().min(2).max(15).required(),
+  //         zipCode: joi.string().min(3).max(15).required(),
+  //      }
+  //       ||
+  //       { 
+  //         orgAddress1: joi.string().optional(), 
+  //         orgAddress2 : joi.string().required(),
+  //         city: joi.string().min(2).max(15).required(),
+  //         state: joi.string().min(2).max(15).required(),
+  //         zipCode: joi.string().min(3).max(15).required(),
+  //       },),
+          
+  //     })
+  // })
+ 
+ 
 
 //login schema
 const userSchemaLogin = joi.object({
@@ -61,6 +90,7 @@ const userSchemaUpd = joi.object({
   lastName: joi.string().min(3).max(15).required().optional(),
   email: joi.string().email().min(5).max(50).optional(),
   password: joi.string().min(5).max(15).required().optional(),
+  updatePassword:joi.boolean().optional(),
   organization: joi
     .object({
       orgName: joi.string().min(3).max(15).optional(),

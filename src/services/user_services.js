@@ -9,16 +9,17 @@ class userServices {
   //Register User
   async userRegister(req, res) {
     try {
-      //userName validation check
-      let data = await userModel.findOne({ userName: req.body.userName });
-      if (data) {
+      //userName & Eamil validation check using mongose query
+      let userData = await userModel.findOne({
+        $or: [{ userName: req.body.userName }, { email: req.body.email }],
+      });
+      if (userData) {
         let resPayload = {
-          message: MESSAGES.USERNAME_USED,
+          message: MESSAGES.USERNAME_EMAIL_USED,
         };
-        return Helper.success(res, resPayload);
+        return Helper.error(res, resPayload);
       }
 
-      //save user data
       let myUser = new userModel(req.body);
 
       const idUser = myUser._id;
@@ -28,16 +29,32 @@ class userServices {
           orgName: req.body.organization.orgName,
           address: req.body.organization.address,
           userId: idUser,
+          inActive: true,
         };
         let myQrg = new organization(attribute);
+        //org save data
         myQrg.save();
       }
 
-      myUser.save();
+      //save user data
+      let registeredUser = await myUser.save();
 
+      //token
+      const TokenID = await userModel.findOne({ userName: req.body.userName });
+      const token = jwt.sign({ _id: TokenID._id }, "mytoken", {
+        expiresIn: "30m",
+      });
+
+      let displayData = {
+        UserName: registeredUser.userName,
+        FirstName: registeredUser.firstName,
+        LastName: registeredUser.lastName,
+        Email: registeredUser.email,
+        TokenId: token,
+      };
       let resPayload = {
         message: MESSAGES.USERNAME__SUCCESS,
-        payload: myUser,
+        payload: displayData,
       };
       return Helper.success(res, resPayload);
     } catch (err) {
@@ -52,49 +69,41 @@ class userServices {
   //Login user
   async userLogin(req, res) {
     try {
-      const ExtUser = await userModel.findOne({ userName: req.body.userName });
-      //user account deleted
-      if (ExtUser.isDeleted == true) {
+
+      //check user is a valid user or not
+      const extUser = await userModel.findOne({ userName: req.body.userName });
+      if (!extUser) {
         let resPayload = {
-          message: MESSAGES.DELETE_USER,
+          message: MESSAGES.LOGIN_ERROR,
+          payload: {},
         };
         return Helper.error(res, resPayload);
-      } else {
-        //Invalid Credentials
-        if (!ExtUser) {
-          let resPayload = {
-            message: MESSAGES.LOGIN_ERROR,
-          };
-          return Helper.error(res, resPayload);
-        }
-        //Password Compare
-        const validPassword = await bcrypt.compare(
-          req.body.password,
-          ExtUser.password
-        );
-
-        //Valid Passoword or not
-        if (!validPassword)
-          return res.status(400).send(MESSAGES.LOGIN_PASSWORD_IN_CORRECT);
-
-        //return res.status(400).send(MESSAGES.LOGIN_PASSWORD_IN_CORRECT);
-
-        const token = jwt.sign({ _id: ExtUser._id }, "mytoken", {
-          expiresIn: "30m",
-        });
-        let resPayload = {
-          message: MESSAGES.LOGIN_SUCCESS,
-          payload: { TokenID: token },
-        };
-        return Helper.success(res, resPayload);
-        // return res.status(200).send({
-        //   message: MESSAGES.LOGIN_SUCCESS,
-        //   Token: token,
-        // });
       }
+      const validPassword = await bcrypt.compare(
+        req.body.password,
+        extUser.password
+      );
+      if (!validPassword) {
+        let resPayload = {
+          message: MESSAGES.LOGIN_PASSWORD_IN_CORRECT,
+          payload: {},
+        };
+        return Helper.error(res, resPayload);
+      }
+
+      // genrate jwt token
+      const token = jwt.sign({ _id: extUser._id }, "mytoken", {
+        expiresIn: "6000s",
+      });
+      let resPayload = {
+        message: MESSAGES.LOGIN_SUCCESS,
+        payload: { token: token },
+      };
+      return Helper.success(res, resPayload);
     } catch (err) {
       let resPayload = {
-        message: MESSAGES.LOGIN_DELETE,
+        message: err.message,
+        payload: {},
       };
       return Helper.error(res, resPayload);
     }
@@ -103,16 +112,6 @@ class userServices {
   // Update user & password
   async userUpdate(req, res) {
     try {
-      if (req.body.password) {
-        const passwrd = await userModel.findOne({ _id: req.user._id });
-        if (passwrd.reset_password == false) {
-          let resPayload = {
-            message: MESSAGES.RESET_PASSWORD,
-            //payload:passwrd
-          };
-          return Helper.success(res, resPayload);
-        }
-      }
       const idUser = req.user._id;
 
       const name = await userModel
@@ -125,11 +124,17 @@ class userServices {
           message: MESSAGES.ALLREADY_REGISTER,
           //payload:name
         };
-        return Helper.success(res, resPayload);
+        return Helper.error(res, resPayload);
       }
 
       //Successfully updated data
       const updateId = req.user._id;
+
+      //password update :  "updatePassword":true
+      if (!req.body.updatePassword) {
+        delete req.body.password;
+      }
+
       const user = await userModel
         .findByIdAndUpdate(updateId, req.body)
         .select("userName firstName lastName email password ");
@@ -147,45 +152,31 @@ class userServices {
     }
   }
 
-
-
   //Add Qrg
   async addQrg(req, res) {
     try {
       const idUser = req.user._id;
       const org = await userModel.findOne({ _id: idUser });
 
-      //User Not Found
-      if (org.isDeleted == true) {
-        let resPayload = {
-          message: MESSAGES.DELETE_NOT_FOUND,
-        };
-        return Helper.success(res, resPayload);
-      }
-
       let attribute = {
         orgName: req.body.orgName,
         address: req.body.address,
         userId: idUser,
+        inActive: true,
       };
       let myQrg = new organization(attribute);
 
-      myQrg
-        .save()
-        .then((value) => {
-          let resPayload = {
-            message: MESSAGES.QRG_SUCCESS,
-            payload: myQrg,
-          };
-          return Helper.success(res, resPayload);
-        })
-        .catch((err) => {
-          let resPayload = {
-            message: err,
-            payload: {},
-          };
-          return Helper.error(res, resPayload);
-        });
+      myQrg.save().then(async (value) => {
+        const updatOrg = await organization.updateMany(
+          { userId: req.user._id, _id: { $ne: value._id } },
+          { inActive: false }
+        );
+        let resPayload = {
+          message: MESSAGES.QRG_SUCCESS,
+          payload: value,updatOrg,
+        };
+        return Helper.success(res, resPayload);
+      });
     } catch (err) {
       let resPayload = {
         message: MESSAGES.SERVER_ERROR,
@@ -213,13 +204,14 @@ class userServices {
             userName: 1,
             org: {
               orgName: 1,
+              inActive: 1,
               address: {
                 orgAddress1: 1,
                 orgAddress2: 1,
                 city: 1,
                 state: 1,
                 zipCode: 1,
-                inActive: 1,
+                //inActive: 1,
               },
             },
           },
@@ -229,7 +221,7 @@ class userServices {
         message: MESSAGES.PROFILE,
         payload: allUserQrg,
       };
-     return Helper.success(res, resPayload);
+      return Helper.success(res, resPayload);
     } catch (err) {
       let resPayload = {
         message: MESSAGES.SERVER_ERROR,
@@ -263,6 +255,7 @@ class userServices {
             userName: 1,
             org: {
               orgName: 1,
+              inActive: 1,
               address: {
                 orgAddress1: 1,
                 orgAddress2: 1,
@@ -275,8 +268,6 @@ class userServices {
           },
         },
       ]);
-
-      //return res.send(allUserQuotes)
       let resPayload = {
         message: MESSAGES.PROFILE,
         payload: allUserOrg,
@@ -294,18 +285,24 @@ class userServices {
   //org update
   async orgUpdate(req, res) {
     try {
-      // const ExtUser = await organization
-      //   .findOne({ id: req.body._id})
-      //Successfully updated data
-      const updateId = req.params.id;
-      //console.log(updateId);
-      const org = await organization.findByIdAndUpdate(updateId, req.body);
-
-      let resPayload = {
-        message: MESSAGES.ORG_UPDATED,
-        payload: org,
-      };
-      return Helper.success(res, resPayload);
+      //const updateId = req.params.id;
+      const org = await organization
+        .findByIdAndUpdate(
+          req.params.id,
+          { ...req.body, inActive: true },
+          { new: true }
+        )
+        .then(async (value) => {
+          const updatOrg = await organization.updateMany(
+            { userId: req.user._id, _id: { $ne: value._id } },
+            { inActive: false }
+          );
+          let resPayload = {
+            message: MESSAGES.ORG_UPDATED,
+            payload: value
+          };
+          return Helper.success(res, resPayload);
+        });
     } catch (err) {
       let resPayload = {
         message: err.message,
@@ -313,38 +310,5 @@ class userServices {
       return Helper.error(res, resPayload);
     }
   }
-
-    //soft delete
-  // async userDelete(req, res) {
-  //   try {
-  //     const id = req.user._id;
-  //     const okUser = await userModel.findOne({ _id: id });
-
-  //     //check it user DB isDeletted true or not
-  //     //User Not Found
-  //     if (okUser.isDeleted == true) {
-  //       let resPayload = {
-  //         message: MESSAGES.DELETE_NOT_FOUND,
-  //       };
-  //       return Helper.success(res, resPayload);
-  //     }
-
-  //     //User Deleted
-  //     const myUser = await userModel
-  //       .findByIdAndUpdate(id, { isDeleted: true })
-  //       .then((item) => {
-  //         let resPayload = {
-  //           message: MESSAGES.DELETE_USER,
-  //         };
-  //         return Helper.success(res, resPayload);
-  //       });
-  //   } catch (error) {
-  //     let resPayload = {
-  //       message: err.message,
-  //       payload: {},
-  //     };
-  //     return Helper.error(res, resPayload);
-  //   }
-  // }
 }
 export default new userServices();

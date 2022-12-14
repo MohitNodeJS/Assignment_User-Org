@@ -30,16 +30,17 @@ const userSchema = new Schema(
     email: {
       type: String,
       required: false,
+      unique: true,
     },
     password: {
       type: String,
       required: false,
       
     },
-    reset_password: {
-      type: Boolean,
-      default:true,
-    },
+    // reset_password: {
+    //   type: Boolean,
+    //   default:true,
+    // },
     
     
   },

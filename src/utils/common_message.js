@@ -1,10 +1,11 @@
 const MESSAGES = {
-  LOGIN_ERROR: "Invalid Credentials", //d
+  LOGIN_ERROR: "Invalid Username", //d
   LOGIN_SUCCESS: "Login successfully", //d
   LOGIN_PASSWORD_IN_CORRECT: "Incorrect Password", //d
   PROFILE: "Profile Information", //d
   UPDATED_SUCCESS: "successfully updated data", //D
-  USERNAME_USED: " UserName allready used",
+  USERNAME_EMAIL_USED: " UserName & email allready used ",
+  EMAIL_USED: "Email  allready used ",
   REGISTER_SUCCESS: "Successfully Register", //D
   REGISTER_ERROR: "Attention: Email Allready Used", //D
   PAYLOAD_ERROR: "Validation Error", //D

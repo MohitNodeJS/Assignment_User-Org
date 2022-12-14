@@ -13,8 +13,8 @@ class Response {
   error(res, data = {}, statusCode = 500) {
     let resPayload = {
       status: false,
-      message: MESSAGES.SERVER_ERROR,
-      //message: data.message,
+      //message: MESSAGES.SERVER_ERROR,
+      message: data.message,
       payload: data.payload,
     };
 

@@ -36,7 +36,7 @@ const Route = (app) => {
   app.get("/api/organization/user", authValidaton, userServices.getUserQrg);
 
   //update organization
-  app.post("/api/org/update/:id",userServices.orgUpdate);
+  app.put("/api/org/update/:id",authValidaton,userServices.orgUpdate);
 
 
   //delete user
