@@ -1,4 +1,3 @@
-import MESSAGES from "./common_message.js";
 
 //predefined strcture
 class Response {
@@ -13,7 +12,6 @@ class Response {
   error(res, data = {}, statusCode = 500) {
     let resPayload = {
       status: false,
-      //message: MESSAGES.SERVER_ERROR,
       message: data.message,
       payload: data.payload,
     };

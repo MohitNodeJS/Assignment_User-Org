@@ -1,11 +1,11 @@
-import ResponseHelper from "../utils/response_helper.js";
+import Response from "../utils/response_helper.js";
 import jwt from "jsonwebtoken";
 import dotenv from "dotenv";
 dotenv.config();
 
 const authValidaton = (req, res, next) => {
   const header = req.headers.authorization;
-  const token = header.replace("Bearer ", "");
+  const token = header.replace("Bearer", "");
 
   try {
     //const decoded= jwt.verify(token, 'mytoken')
@@ -16,7 +16,7 @@ const authValidaton = (req, res, next) => {
       message: err.message,
       payload: {},
     };
-    return ResponseHelper.error(res, payload, 401);
+    return Response.error(res, payload, 401);
   }
   next();
 };
