@@ -1,4 +1,3 @@
-
 //predefined strcture
 class Response {
   success(res, data, statuscode = 200) {
@@ -15,7 +14,6 @@ class Response {
       message: data.message,
       payload: data.payload,
     };
-
     return res.status(statusCode).send(resPayload);
   }
 }

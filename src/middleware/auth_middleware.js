@@ -8,7 +8,6 @@ const authValidaton = (req, res, next) => {
   const token = header.replace("Bearer ", "");//Bearer display string format: AbCdEf123456
 
   try {
-    //const decoded= jwt.verify(token, 'mytoken')
     const decoded = jwt.verify(token, process.env.MY_TOKEN);
     req.user = decoded;
   } catch (err) {

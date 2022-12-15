@@ -21,7 +21,7 @@ class orgServices {
 
       myQrg.save().then(async (value) => {
         const updatOrg = await organization.updateMany(
-          { userId: req.user._id, _id: { $ne: value._id } },
+          { userId: req.user._id, _id: { $ne: value._id } },//$ne : Not Equal to idUser
           { inActive: false }
         );
         let resPayload = {
@@ -147,7 +147,7 @@ class orgServices {
         )
         .then(async (value) => {
           const updatOrg = await organization.updateMany(
-            { userId: req.user._id, _id: { $ne: value._id } },
+            { userId: req.user._id, _id: { $ne: value._id } }, //$ne : Not Equal to idUser
             { inActive: false }
           );
           let resPayload = {

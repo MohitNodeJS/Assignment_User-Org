@@ -115,7 +115,7 @@ class userServices {
       const idUser = req.user._id;
 
       const name = await userModel
-        .findOne({ userName: req.body.userName, _id: { $ne: idUser } })
+        .findOne({ userName: req.body.userName, _id: { $ne: idUser } })//$ne : Not Equal to idUser
         .lean();
 
       //name allready used

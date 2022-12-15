@@ -3,9 +3,9 @@ import { Schema } from "mongoose";
 import bcrypt from "bcryptjs";
 import { nanoid } from "nanoid";
 
-
 //soft delete
-const { softDeletePlugin } = require("soft-delete-plugin-mongoose");
+import { softDeletePlugin } from "soft-delete-plugin-mongoose";
+//const { softDeletePlugin } = require("soft-delete-plugin-mongoose");
 
 
 const userSchema = new Schema(
@@ -37,21 +37,12 @@ const userSchema = new Schema(
       required: false,
       
     },
-    // reset_password: {
-    //   type: Boolean,
-    //   default:true,
-    // },
-    
-    
   },
   { timestamps: true } //timestamps : save the current time of the document created
 );
 
-
 //soft delete
 userSchema.plugin(softDeletePlugin);
-
-
 
 //save case password bcrypt
 userSchema.pre("save", async function (next) {
