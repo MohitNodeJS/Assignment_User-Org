@@ -41,7 +41,7 @@ class userServices {
 
       //token
       const TokenID = await userModel.findOne({ userName: req.body.userName });
-      const token = jwt.sign({ _id: TokenID._id }, "mytoken", {
+      const token = jwt.sign({ _id: TokenID._id }, process.env.MY_TOKEN, {
         expiresIn: "30m",
       });
 
@@ -92,7 +92,7 @@ class userServices {
       }
 
       // genrate jwt token
-      const token = jwt.sign({ _id: extUser._id }, "mytoken", {
+      const token = jwt.sign({ _id: extUser._id }, process.env.MY_TOKEN, {
         expiresIn: "6000s",
       });
       let resPayload = {
