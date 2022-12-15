@@ -5,7 +5,7 @@ dotenv.config();
 
 const authValidaton = (req, res, next) => {
   const header = req.headers.authorization;
-  const token = header.replace("Bearer", "");
+  const token = header.replace("Bearer ", "");//Bearer display string format: AbCdEf123456
 
   try {
     //const decoded= jwt.verify(token, 'mytoken')
