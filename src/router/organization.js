@@ -14,6 +14,5 @@ const OrgRoute = (app) => {
   //update organization
   app.put("/api/org/update/:id",[authValidaton, JoiMainMiddleware.JoiMiddleware],orgServices.orgUpdate);
 
-
 }
 export default OrgRoute;

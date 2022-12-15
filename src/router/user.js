@@ -2,8 +2,9 @@ import userServices from "../services/user_services.js";
 import JoiMainMiddleware from "../middleware/joi_middleware.js";
 import authValidaton from "../middleware/auth_middleware.js";
 const UserRoute = (app) => {
-//Register User
-app.post(
+
+  //Register User
+  app.post(
     "/api/user/add",
     JoiMainMiddleware.JoiMiddleware,
     userServices.userRegister
@@ -24,6 +25,5 @@ app.post(
   );
   
 }
-
 
 export default UserRoute;
